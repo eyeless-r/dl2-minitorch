@@ -2,6 +2,7 @@
 Be sure you have minitorch installed in you Virtual Env.
 >>> pip install -Ue .
 """
+import time
 
 import minitorch
 
@@ -70,6 +71,7 @@ class TensorTrain:
         X = minitorch.tensor(data.X)
         y = minitorch.tensor(data.y)
 
+        prev = time.time()
         losses = []
         for epoch in range(1, self.max_epochs + 1):
             total_loss = 0.0
@@ -93,11 +95,14 @@ class TensorTrain:
                 y2 = minitorch.tensor(data.y)
                 correct = int(((out.detach() > 0.5) == y2).sum()[0])
                 log_fn(epoch, total_loss, correct, losses)
+            if epoch % 100 == 0:
+                print(f'mean time per epoch (last 100 epochs): {(time.time() - prev) / 100:.3f}s')
+                prev = time.time()
 
 
 if __name__ == "__main__":
     PTS = 50
-    HIDDEN = 2
+    HIDDEN = 15
     RATE = 0.5
-    data = minitorch.datasets["Simple"](PTS)
+    data = minitorch.datasets["Spiral"](PTS)
     TensorTrain(HIDDEN).train(data, RATE)

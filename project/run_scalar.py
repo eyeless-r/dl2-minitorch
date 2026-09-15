@@ -3,6 +3,7 @@ Be sure you have minitorch installed in you Virtual Env.
 >>> pip install -Ue .
 """
 import random
+import time
 
 import minitorch
 
@@ -73,6 +74,7 @@ class ScalarTrain:
         self.model = Network(self.hidden_layers)
         optim = minitorch.SGD(self.model.parameters(), learning_rate)
 
+        prev = time.time()
         losses = []
         for epoch in range(1, self.max_epochs + 1):
             total_loss = 0.0
@@ -106,11 +108,14 @@ class ScalarTrain:
             # Logging
             if epoch % 10 == 0 or epoch == max_epochs:
                 log_fn(epoch, total_loss, correct, losses)
+            if epoch % 100 == 0:
+                print(f'mean time per epoch (last 100 epochs): {(time.time() - prev) / 100:.3f}s')
+                prev = time.time()
 
 
 if __name__ == "__main__":
     PTS = 50
-    HIDDEN = 2
+    HIDDEN = 15
     RATE = 0.5
-    data = minitorch.datasets["Simple"](PTS)
+    data = minitorch.datasets["Spiral"](PTS)
     ScalarTrain(HIDDEN).train(data, RATE)
